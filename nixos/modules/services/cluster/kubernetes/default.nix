@@ -1022,7 +1022,7 @@ in {
             --kubeconfig=${mkKubeConfig "kube-controller-manager" cfg.controllerManager.kubeconfig} \
             --leader-elect=${boolToString cfg.controllerManager.leaderElect} \
             ${optionalString (cfg.controllerManager.serviceAccountKeyFile!=null)
-              "--service-account-key-file=${cfg.controllerManager.serviceAccountKeyFile}"} \
+              "--service-account-privat-key-file=${cfg.controllerManager.serviceAccountKeyFile}"} \
             ${optionalString (cfg.controllerManager.rootCaFile!=null)
               "--root-ca-file=${cfg.controllerManager.rootCaFile}"} \
             ${optionalString (cfg.clusterCidr!=null)
