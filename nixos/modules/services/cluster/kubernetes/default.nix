@@ -224,7 +224,7 @@ in {
     caFile = mkOption {
       description = "Default kubernetes certificate authority";
       type = types.nullOr types.path;
-      default = null;
+      default = "/var/run/kubernetes/apiserver.crt";
     };
 
     dataDir = mkOption {
@@ -408,10 +408,10 @@ in {
       serviceAccountKeyFile = mkOption {
         description = ''
           Kubernetes apiserver PEM-encoded x509 RSA private or public key file,
-          used to verify ServiceAccount tokens. By default tls private key file
+          used to verify ServiceAccount tokens. If not set, tls private key file
           is used.
         '';
-        default = null;
+        default = config.services.kubernetes.controllerManager.serviceAccountKeyFile;
         type = types.nullOr types.path;
       };
 
@@ -522,7 +522,7 @@ in {
           Kubernetes controller manager PEM-encoded private RSA key file used to
           sign service account tokens
         '';
-        default = null;
+        default = "/var/run/kubernetes/apiserver.key";
         type = types.nullOr types.path;
       };
 
@@ -1021,12 +1021,10 @@ in {
             --port=${toString cfg.controllerManager.port} \
             --kubeconfig=${mkKubeConfig "kube-controller-manager" cfg.controllerManager.kubeconfig} \
             --leader-elect=${boolToString cfg.controllerManager.leaderElect} \
-            ${if (cfg.controllerManager.serviceAccountKeyFile!=null)
-              then "--service-account-private-key-file=${cfg.controllerManager.serviceAccountKeyFile}"
-              else "--service-account-private-key-file=/var/run/kubernetes/apiserver.key"} \
-            ${if (cfg.controllerManager.rootCaFile!=null)
-              then "--root-ca-file=${cfg.controllerManager.rootCaFile}"
-              else "--root-ca-file=/var/run/kubernetes/apiserver.crt"} \
+            ${optionalString (cfg.controllerManager.serviceAccountKeyFile!=null)
+              "--service-account-key-file=${cfg.controllerManager.serviceAccountKeyFile}"} \
+            ${optionalString (cfg.controllerManager.rootCaFile!=null)
+              "--root-ca-file=${cfg.controllerManager.rootCaFile}"} \
             ${optionalString (cfg.clusterCidr!=null)
               "--cluster-cidr=${cfg.clusterCidr}"} \
             --allocate-node-cidrs=true \
