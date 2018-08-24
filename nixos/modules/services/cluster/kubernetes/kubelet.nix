@@ -148,7 +148,7 @@ in
     };
 
     featureGates = mkOption {
-      description = "List set of feature gates";
+      description = "List of feature gates to enable.";
       default = top.featureGates;
       type = listOf str;
     };

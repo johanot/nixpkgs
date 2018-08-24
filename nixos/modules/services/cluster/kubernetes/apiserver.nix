@@ -137,13 +137,17 @@ in
     };
 
     extraSANs = mkOption {
-      description = "Extra x509 Subject Alternative Names to be added to the kubernetes apiserver tls cert.";
+      description = ''
+        Extra x509 Subject Alternative Names or IP SANs to be added to
+        the kubernetes apiserver tls cert.
+      '';
+      example = [ "apiserver.my.extra.domain" "172.16.255.255" ];
       default = [];
       type = listOf str;
     };
 
     featureGates = mkOption {
-      description = "List set of feature gates";
+      description = "List of feature gates to enable.";
       default = top.featureGates;
       type = listOf str;
     };
@@ -211,8 +215,8 @@ in
     serviceAccountKeyFile = mkOption {
       description = ''
         Kubernetes apiserver PEM-encoded x509 RSA private or public key file,
-        used to verify ServiceAccount tokens. By default tls private key file
-        is used.
+        used to verify ServiceAccount tokens. By default
+        <xref linkend="opt-services.kubernetes.apiserver.tlsKeyFile"/> is used.
       '';
       default = null;
       type = nullOr path;
