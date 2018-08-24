@@ -43,7 +43,11 @@ in
     enable = mkEnableOption "Whether to enable easyCert issuer service.";
 
     certs = mkOption {
-      description = "List of certificate specs to feed to cert generator.";
+      description = ''
+        List of certificate specs to feed to cert generator.
+        See also:
+        <link xlink:href="https://github.com/cloudflare/certmgr#certificate-specs"/>
+      '';
       default = {};
       type = attrs;
     };

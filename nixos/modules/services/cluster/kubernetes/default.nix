@@ -33,6 +33,9 @@ let
 
   etcdEndpoints = ["https://${cfg.masterAddress}:2379"];
 
+  # Util that produces a certmgr certSpec
+  # (ref: https://github.com/cloudflare/certmgr#certificate-specs)
+  # as an attrset based on sensible default values.
   mkCert = { name, CN, hosts ? [], fields ? {}, action ? "",
              privateKeyOwner ? "kubernetes" }: rec {
     inherit name caCert CN hosts fields action;
@@ -127,13 +130,16 @@ in {
     };
 
     easyCerts = mkOption {
-      description = "Automatically setup x509 certificates and keys for the entire cluster.";
+      description = ''
+        Automatically setup x509 certificates and keys for the entire cluster.
+        See the Kubernetes section of the NixOS manual for details.
+      '';
       default = false;
       type = types.bool;
     };
 
     featureGates = mkOption {
-      description = "List set of feature gates.";
+      description = "List of feature gates to enable.";
       default = [];
       type = types.listOf types.str;
     };
