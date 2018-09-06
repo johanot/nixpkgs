@@ -27,6 +27,10 @@ let
   certmgrAPITokenPath = "${top.secretsPath}/${cfsslAPITokenBaseName}";
   cfsslAPITokenLength = 32;
 
+  genPasswd = pkgs.writeScript "genPasswd" ''
+    head -c $(($1/2)) /dev/random | od -An -t x | tr -d ' '
+  '';
+
   clusterAdminKubeconfig = with cfg.certs.clusterAdmin;
     top.lib.mkKubeConfig "cluster-admin" {
         server = top.apiserverAddress;
@@ -167,7 +171,7 @@ in
       '')
       (optionalString cfg.genCfsslAPIToken ''
         if [ ! -f "${cfsslAPITokenPath}" ]; then
-          head -c ${toString (cfsslAPITokenLength / 2)} /dev/urandom | od -An -t x | tr -d ' ' >"${cfsslAPITokenPath}"
+          ${genPasswd} ${toString cfsslAPITokenLength} >"${cfsslAPITokenPath}"
         fi
         chown cfssl "${cfsslAPITokenPath}" && chmod 400 "${cfsslAPITokenPath}"
       '')]);
@@ -194,6 +198,54 @@ in
           ${pkgs.curl}/bin/curl --fail-early -f -kd '{}' ${remote}/api/v1/cfssl/info | \
             ${pkgs.cfssl}/bin/cfssljson -stdout >${top.caFile}
         fi
+      '')
+      ];
+      serviceConfig = {
+        RestartSec = "10s";
+        Restart = "on-failure";
+      };
+    };
+
+    # Enable RBAC on etcd and configure access rigths for flannel and apiserver
+    systemd.services.kube-etcd-bootstrap = mkIf (config.services.etcd.enable) {
+      description = "Kubernetes etcd bootstrapper";
+      wantedBy = [ "etcd.service" ];
+      after = [ "etcd.service" ];
+      environment = with cfg.certs.rootEtcdClient; {
+        ETCDCTL_API = "3";
+        ETCDCTL_ENDPOINTS = concatStringsSep "," config.services.etcd.advertiseClientUrls;
+        ETCDCTL_CACERT = caCert;
+        ETCDCTL_CERT = cert;
+        ETCDCTL_KEY = key;
+      };
+      path = [ pkgs.etcdctl ];
+      script = concatStringsSep "\n" [''
+        set +e
+
+        # Must be here, otherwise etcd won't enable auth
+        ${genPasswd} 32 | etcdctl user add --interactive=false root
+
+        ${genPasswd} 32 | etcdctl user add --interactive=false etcd-client-root
+        etcdctl user grant-role etcd-client-root root
+
+        # Etcd has a default guest account and we don't want that
+        etcdctl role remove guest
+
+        if ! etcdctl auth enable; then
+          exit 1
+        fi
+      ''
+      (optionalString (top.apiserver.enable) ''
+        etcdctl role add kube-apiserver
+        etcdctl role grant-permission kube-apiserver --prefix=true readwrite /registry/
+        ${genPasswd} 32 | etcdctl user add --interactive=false ${cfg.certs.apiserverEtcdClient.CN}
+        etcdctl user grant-role ${cfg.certs.apiserverEtcdClient.CN} kube-apiserver
+      '')
+      (optionalString (top.flannel.enable) ''
+        etcdctl role add flannel
+        etcdctl role grant-permission flannel --prefix=true readwrite ${config.services.flannel.etcd.prefix}
+        ${genPasswd} 32 | etcdctl user add --interactive=false ${cfg.certs.flannelEtcdClient.CN}
+        etcdctl user grant-role ${cfg.certs.flannelEtcdClient.CN} flannel
       '')
       ];
       serviceConfig = {

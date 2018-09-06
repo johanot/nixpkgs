@@ -71,7 +71,7 @@ in
     services.kubernetes.pki.certs = {
       flannelEtcdClient = top.lib.mkCert {
         name = "flannel-etcd-client";
-        CN = "flannel-etcd-client";
+        CN = "etcd-client-flannel";
         action = "systemctl restart flannel.service";
       };
     };

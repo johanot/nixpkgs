@@ -400,7 +400,7 @@ in
         };
         apiserverEtcdClient = mkCert {
           name = "kube-apiserver-etcd-client";
-          CN = "etcd-client";
+          CN = "etcd-client-kube-apiserver";
           action = "systemctl restart kube-apiserver.service";
         };
         clusterAdmin = mkCert {
@@ -421,6 +421,11 @@ in
                   ];
           privateKeyOwner = "etcd";
           action = "systemctl restart etcd.service";
+        };
+        rootEtcdClient = mkCert {
+          name = "root-etcd-client";
+          CN = "etcd-client-root";
+          privateKeyOwner = "root";
         };
       };
 
