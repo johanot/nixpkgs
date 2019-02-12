@@ -87,6 +87,15 @@ in {
       type = types.str;
     };
 
+    nodeName = mkOption {
+      description = ''
+        Needed when running with Kubernetes as backend as this cannot be auto-detected";
+      '';
+      type = types.nullOr types.str;
+      default = with config.networking; (hostName + optionalString (!isNull domain) ".${domain}");
+      example = "node1.example.com";
+    };
+
     storageBackend = mkOption {
       description = "Determines where flannel stores its configuration at runtime";
       type = types.enum ["etcd" "kubernetes"];
@@ -150,8 +159,12 @@ in {
       } // optionalAttrs (cfg.storageBackend == "kubernetes") {
         FLANNELD_KUBE_SUBNET_MGR = "true";
         FLANNELD_KUBECONFIG_FILE = cfg.kubeconfig;
+        NODE_NAME = cfg.nodeName;
       };
-      preStart = mkIf (cfg.storageBackend == "etcd") ''
+      preStart = ''
+        mkdir -p /run/flannel
+        touch /run/flannel/docker
+      '' + optionalString (cfg.storageBackend == "etcd") ''
         echo "setting network configuration"
         until ${pkgs.etcdctl.bin}/bin/etcdctl set /coreos.com/network/config '${builtins.toJSON networkConfig}'
         do
@@ -159,13 +172,11 @@ in {
           sleep 1
         done
       '';
-      postStart = ''
-        while [ ! -f /run/flannel/subnet.env ]
-        do
-          sleep 1
-        done
-      '';
-      serviceConfig.ExecStart = "${cfg.package}/bin/flannel";
+      serviceConfig = {
+        ExecStart = "${cfg.package}/bin/flannel";
+        Restart = "always";
+        RestartSec = "10s";
+      };
     };
 
     services.etcd.enable = mkDefault (cfg.storageBackend == "etcd" && cfg.etcd.endpoints == ["http://127.0.0.1:2379"]);
