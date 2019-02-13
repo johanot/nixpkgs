@@ -9,22 +9,22 @@
 *
 */
 
-/* 
- * 
+/*
+ *
  * Internationalization
- * 
+ *
  * The net-tools package has currently been translated to French,
  * German and Brazilian Portugese.  Other translations are, of
  * course, welcome.  Answer `n' here if you have no support for
  * internationalization on your system.
- * 
+ *
  */
 #define I18N 0
 
-/* 
- * 
+/*
+ *
  * Protocol Families.
- * 
+ *
  */
 #define HAVE_AFUNIX 1
 #define HAVE_AFINET 1
@@ -40,10 +40,10 @@
 #define HAVE_AFASH 0
 #define HAVE_AFBLUETOOTH 0
 
-/* 
- * 
+/*
+ *
  * Device Hardware types.
- * 
+ *
  */
 #define HAVE_HWETHER 1
 #define HAVE_HWARC 1
@@ -68,12 +68,14 @@
 #define HAVE_HWEUI64 1
 #define HAVE_HWIB 1
 
-/* 
- * 
+/*
+ *
  * Other Features.
- * 
+ *
  */
 #define HAVE_FW_MASQUERADE 0
 #define HAVE_IP_TOOLS 0
+#define HAVE_HOSTNAME_SYMLINKS 1
+#define HAVE_HOSTNAME_TOOLS 1
 #define HAVE_MII 0
 #define HAVE_SELINUX 0
