@@ -8,6 +8,13 @@ in {
   options.services.kubernetes.addons.dashboard = {
     enable = mkEnableOption "kubernetes dashboard addon";
 
+    extraArgs = mkOption {
+      description = "Extra arguments to append to the dashboard cmdline";
+      type = types.listOf types.str;
+      default = [];
+      example = ["--enable-skip-login"];
+    };
+
     rbac = mkOption {
       description = "Role-based access control (RBAC) options";
       default = {};
@@ -99,7 +106,7 @@ in {
                     memory = "100Mi";
                   };
                 };
-                args = ["--auto-generate-certificates"];
+                args = ["--auto-generate-certificates"] ++ cfg.extraArgs;
                 volumeMounts = [{
                   name = "tmp-volume";
                   mountPath = "/tmp";
