@@ -31,7 +31,7 @@ in {
     version = mkOption {
       description = "Which version of the kubernetes dashboard to deploy";
       type = types.str;
-      default = "v1.8.3";
+      default = "v1.10.1";
     };
 
     image = mkOption {
@@ -39,9 +39,9 @@ in {
       type = types.attrs;
       default = {
         imageName = "k8s.gcr.io/kubernetes-dashboard-amd64";
-        imageDigest = "sha256:dc4026c1b595435ef5527ca598e1e9c4343076926d7d62b365c44831395adbd0";
+        imageDigest = "sha256:0ae6b69432e78069c5ce2bcde0fe409c5c4d6f0f4d9cd50a17974fea38898747";
         finalImageTag = cfg.version;
-        sha256 = "18ajcg0q1vignfjk2sm4xj4wzphfz8wah69ps8dklqfvv0164mc8";
+        sha256 = "01xrr4pwgr2hcjrjsi3d14ifpzdfbxzqpzxbk2fkbjb9zkv38zxy";
       };
     };
   };
