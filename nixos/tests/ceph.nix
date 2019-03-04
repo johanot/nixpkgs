@@ -40,6 +40,9 @@ import ./make-test.nix ({pkgs, lib, ...}: rec {
       services.ceph.mon = {
         enable = true;
         daemons = [ "aio" ];
+        extraConfig = {
+          "mgr initial modules" = "dashboard";
+        };
       };
 
       services.ceph.mgr = {
