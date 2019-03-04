@@ -102,6 +102,7 @@ in rec {
       ./0000-fix-SPDK-build-env.patch
       # TODO: remove when https://github.com/ceph/ceph/pull/21289 is merged
       ./0000-ceph-volume-allow-loop.patch
+      ./0000-dont-check-cherrypy-version.patch
     ];
 
     nativeBuildInputs = [
