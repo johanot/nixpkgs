@@ -88,14 +88,14 @@ let
     ps.bcrypt
   ]);
 
-  version = "13.2.6";
+  version = "14.2.1";
 in rec {
   ceph = stdenv.mkDerivation {
     name="ceph-${version}";
 
     src = fetchurl {
       url = "http://download.ceph.com/tarballs/ceph-${version}.tar.gz";
-      sha256 = "13f5qs7jpxprplk4irwlx90mc9gvm48fvd3q471xcqc3n6z1qywz";
+      sha256 = "0qa9p8xp26d45h3jfj1rbwhmqv44f9n1mvccmpzaf2i05v42kmzb";
     };
 
     patches = [
