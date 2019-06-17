@@ -8,7 +8,7 @@
 , babeltrace, gperf
 , cunit, snappy
 , rocksdb, makeWrapper
-, leveldb, oathToolkit
+, leveldb, oathToolkit, removeReferencesTo
 
 # Optional Dependencies
 , yasm ? null, fcgi ? null, expat ? null
@@ -116,6 +116,7 @@ in rec {
       malloc zlib openldap lttng-ust babeltrace gperf cunit
       snappy rocksdb lz4 oathToolkit leveldb
       optKinetic-cpp-client
+      removeReferencesTo
     ] ++ optionals stdenv.isLinux [
       linuxHeaders utillinux libuuid udev keyutils optLibaio optLibxfs optZfs
       # ceph 14
@@ -149,6 +150,10 @@ in rec {
       # TODO breaks with sandbox, tries to download stuff with npm
       "-DWITH_MGR_DASHBOARD_FRONTEND=OFF"
     ];
+
+    preFixup = ''
+      find $lib -type f -exec remove-references-to -t $out '{}' +
+    '';
 
     postFixup = ''
       wrapPythonPrograms
