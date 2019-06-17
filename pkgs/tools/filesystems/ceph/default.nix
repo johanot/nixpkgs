@@ -2,7 +2,7 @@
 , ensureNewerSourcesHook
 , cmake, pkgconfig
 , which, git
-, boost, python2Packages
+, boost, python3Packages
 , libxml2, zlib, lz4
 , openldap, lttng-ust
 , babeltrace, gperf
@@ -73,7 +73,7 @@ let
     none = [ ];
   };
 
-  ceph-python-env = python2Packages.python.withPackages (ps: [
+  ceph-python-env = python3Packages.python.withPackages (ps: [
     ps.sphinx
     ps.flask
     ps.cython
@@ -107,7 +107,7 @@ in rec {
 
     nativeBuildInputs = [
       cmake
-      pkgconfig which git python2Packages.wrapPython makeWrapper
+      pkgconfig which git python3Packages.wrapPython makeWrapper
       (ensureNewerSourcesHook { year = "1980"; })
     ];
 
@@ -128,18 +128,19 @@ in rec {
       substituteInPlace src/common/module.c --replace "/sbin/modinfo"  "modinfo"
       substituteInPlace src/common/module.c --replace "/sbin/modprobe" "modprobe"
       # Since Boost 1.67 this seems to have changed
-      substituteInPlace CMakeLists.txt --replace "list(APPEND BOOST_COMPONENTS python)" "list(APPEND BOOST_COMPONENTS python27)"
-      substituteInPlace src/CMakeLists.txt --replace "Boost::python " "Boost::python27 "
+      substituteInPlace CMakeLists.txt --replace "list(APPEND BOOST_COMPONENTS python)" "list(APPEND BOOST_COMPONENTS python37)"
+      substituteInPlace src/CMakeLists.txt --replace "Boost::python " "Boost::python37 "
 
       # for pybind/rgw to find internal dep
       export LD_LIBRARY_PATH="$PWD/build/lib:$LD_LIBRARY_PATH"
       # install target needs to be in PYTHONPATH for "*.pth support" check to succeed
-      export PYTHONPATH=$lib/lib/python2.7/site-packages/:$out/lib/python2.7/site-packages/
+      export PYTHONPATH=$lib/lib/python3.7/site-packages/:$out/lib/python3.7/site-packages/
 
       patchShebangs src/spdk
     '';
 
     cmakeFlags = [
+      "-DWITH_PYTHON3=ON"
       "-DWITH_SYSTEM_ROCKSDB=ON"
       "-DROCKSDB_INCLUDE_DIR=${rocksdb}/include/rocksdb"
       "-DWITH_SYSTEM_BOOST=ON"
@@ -151,7 +152,7 @@ in rec {
 
     postFixup = ''
       wrapPythonPrograms
-      wrapProgram $out/bin/ceph-mgr --prefix PYTHONPATH ":" "$lib/lib/ceph/mgr:$out/lib/python2.7/site-packages/"
+      wrapProgram $out/bin/ceph-mgr --prefix PYTHONPATH ":" "$lib/lib/ceph/mgr:$out/lib/python3.7/site-packages/"
     '';
 
     enableParallelBuilding = true;
@@ -178,11 +179,11 @@ in rec {
         platforms = platforms.unix;
       };
     } ''
-      mkdir -p $out/{bin,etc,lib/python2.7/site-packages}
+      mkdir -p $out/{bin,etc,lib/python3.7/site-packages}
       cp -r ${ceph}/bin/{ceph,.ceph-wrapped,rados,rbd,rbdmap} $out/bin
       cp -r ${ceph}/bin/ceph-{authtool,conf,dencoder,rbdnamer,syn} $out/bin
       cp -r ${ceph}/bin/rbd-replay* $out/bin
-      cp -r ${ceph}/lib/python2.7/site-packages $out/lib/python2.7/
+      cp -r ${ceph}/lib/python3.7/site-packages $out/lib/python3.7/
       cp -r ${ceph}/etc/bash_completion.d $out/etc
       # wrapPythonPrograms modifies .ceph-wrapped, so lets just update its paths
       substituteInPlace $out/bin/ceph          --replace ${ceph} $out
