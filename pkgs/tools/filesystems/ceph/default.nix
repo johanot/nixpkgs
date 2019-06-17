@@ -24,7 +24,7 @@
 , nss ? null, nspr ? null
 
 # Linux Only Dependencies
-, linuxHeaders, utillinux, libuuid, udev, keyutils
+, linuxHeaders, utillinux, libuuid, udev, keyutils, rdma-core, rabbitmq-c
 , libaio ? null, libxfs ? null, zfs ? null
 , ...
 }:
@@ -118,6 +118,8 @@ in rec {
       optKinetic-cpp-client
     ] ++ optionals stdenv.isLinux [
       linuxHeaders utillinux libuuid udev keyutils optLibaio optLibxfs optZfs
+      # ceph 14
+      rdma-core rabbitmq-c
     ] ++ optionals hasRadosgw [
       optFcgi optExpat optCurl optFuse optLibedit
     ];
