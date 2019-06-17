@@ -1,12 +1,11 @@
 diff --git a/src/pybind/mgr/dashboard/module.py b/src/pybind/mgr/dashboard/module.py
-index 48babed595..6f0201dde0 100644
+index a8a3ec07c1..bcc9b86c37 100644
 --- a/src/pybind/mgr/dashboard/module.py
 +++ b/src/pybind/mgr/dashboard/module.py
-@@ -29,41 +29,6 @@ except ImportError:
-     # To be picked up and reported by .can_run()
-     cherrypy = None
+@@ -25,40 +25,6 @@ except ImportError:
  
--
+ from .services.sso import load_sso_db
+ 
 -# The SSL code in CherryPy 3.5.0 is buggy.  It was fixed long ago,
 -# but 3.5.0 is still shipping in major linux distributions
 -# (Fedora 27, Ubuntu Xenial), so we must monkey patch it to get SSL working.
@@ -14,7 +13,7 @@ index 48babed595..6f0201dde0 100644
 -    v = StrictVersion(cherrypy.__version__)
 -    # It was fixed in 3.7.0.  Exact lower bound version is probably earlier,
 -    # but 3.5.0 is what this monkey patch is tested on.
--    if v >= StrictVersion("3.5.0") and v < StrictVersion("3.7.0"):
+-    if StrictVersion("3.5.0") <= v < StrictVersion("3.7.0"):
 -        from cherrypy.wsgiserver.wsgiserver2 import HTTPConnection,\
 -                                                    CP_fileobject
 -
@@ -43,12 +42,12 @@ index 48babed595..6f0201dde0 100644
 -
  if 'COVERAGE_ENABLED' in os.environ:
      import coverage
-     _cov = coverage.Coverage(config_file="{}/.coveragerc".format(os.path.dirname(__file__)))
+     __cov = coverage.Coverage(config_file="{}/.coveragerc".format(os.path.dirname(__file__)),
 diff --git a/src/pybind/mgr/prometheus/module.py b/src/pybind/mgr/prometheus/module.py
-index 2d4472434a..63d67858a6 100644
+index b7fecf8d85..dfd4160591 100644
 --- a/src/pybind/mgr/prometheus/module.py
 +++ b/src/pybind/mgr/prometheus/module.py
-@@ -16,20 +16,6 @@ from mgr_module import MgrModule, MgrStandbyModule, CommandResult
+@@ -18,20 +18,6 @@ from rbd import RBD
  DEFAULT_ADDR = '::'
  DEFAULT_PORT = 9283
  
