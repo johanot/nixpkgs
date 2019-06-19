@@ -86,6 +86,7 @@ let
     ps.prettytable
     ps.webob
     ps.bcrypt
+    ps.six
   ]);
 
   version = "14.2.1";
