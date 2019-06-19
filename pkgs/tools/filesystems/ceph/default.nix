@@ -154,11 +154,12 @@ in rec {
 
     preFixup = ''
       find $lib -type f -exec remove-references-to -t $out '{}' +
+      mv $out/share/ceph/mgr $lib/lib/ceph/
     '';
 
     postFixup = ''
       wrapPythonPrograms
-      wrapProgram $out/bin/ceph-mgr --prefix PYTHONPATH ":" "$lib/lib/ceph/mgr:$out/lib/python3.7/site-packages/"
+      wrapProgram $out/bin/ceph-mgr --prefix PYTHONPATH ":" "${ceph-python-env}/lib/python3.7/site-packages:$lib/lib/ceph/mgr:$out/lib/python3.7/site-packages/"
     '';
 
     enableParallelBuilding = true;
