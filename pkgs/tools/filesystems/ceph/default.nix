@@ -136,7 +136,7 @@ in rec {
       # for pybind/rgw to find internal dep
       export LD_LIBRARY_PATH="$PWD/build/lib:$LD_LIBRARY_PATH"
       # install target needs to be in PYTHONPATH for "*.pth support" check to succeed
-      export PYTHONPATH=$lib/lib/python3.7/site-packages/:$out/lib/python3.7/site-packages/
+      export PYTHONPATH=${ceph-python-env}/lib/python3.7/site-packages:$lib/lib/python3.7/site-packages/:$out/lib/python3.7/site-packages/
 
       patchShebangs src/spdk
     '';
@@ -158,8 +158,10 @@ in rec {
     '';
 
     postFixup = ''
+      export PYTHONPATH="${ceph-python-env}/lib/python3.7/site-packages:$lib/lib/ceph/mgr:$out/lib/python3.7/site-packages/"
       wrapPythonPrograms
       wrapProgram $out/bin/ceph-mgr --prefix PYTHONPATH ":" "${ceph-python-env}/lib/python3.7/site-packages:$lib/lib/ceph/mgr:$out/lib/python3.7/site-packages/"
+      wrapProgram $out/bin/ceph-volume --prefix PYTHONPATH ":" "${ceph-python-env}/lib/python3.7/site-packages:$lib/lib/ceph/mgr:$out/lib/python3.7/site-packages/"
     '';
 
     enableParallelBuilding = true;
