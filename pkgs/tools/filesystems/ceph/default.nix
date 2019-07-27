@@ -143,8 +143,8 @@ in rec {
 
     cmakeFlags = [
       "-DWITH_PYTHON3=ON"
-      "-DWITH_SYSTEM_ROCKSDB=ON"
-      "-DROCKSDB_INCLUDE_DIR=${rocksdb}/include/rocksdb"
+      "-DWITH_SYSTEM_ROCKSDB=OFF"
+
       "-DWITH_SYSTEM_BOOST=ON"
       "-DWITH_SYSTEMD=OFF"
       "-DWITH_TESTS=OFF"
