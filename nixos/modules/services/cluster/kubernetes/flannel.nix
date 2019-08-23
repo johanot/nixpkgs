@@ -43,6 +43,7 @@ in
       network = mkDefault top.clusterCidr;
       inherit storageBackend kubeconfig;
       nodeName = top.kubelet.hostname;
+      backend = mkDefault { Type = "ipip"; };
     };
 
     services.kubernetes.kubelet = {
@@ -130,10 +131,6 @@ in
     virtualisation.docker.extraOptions = "$DOCKER_OPTS";
 
     networking = {
-      firewall.allowedUDPPorts = [
-        8285  # flannel udp
-        8472  # flannel vxlan
-      ];
       dhcpcd.denyInterfaces = [ "docker*" "flannel*" ];
     };
 
