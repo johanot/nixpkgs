@@ -131,6 +131,8 @@ in
       '';
       serviceConfig = {
         RestartSec = "30s";
+        StartLimitInterval = 10;
+        StartLimitBurst = 20;
         Restart = "on-failure";
         Slice = "kubernetes.slice";
         ExecStart = ''${top.package}/bin/kube-controller-manager \

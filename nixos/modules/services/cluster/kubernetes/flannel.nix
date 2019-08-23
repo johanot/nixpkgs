@@ -105,6 +105,10 @@ in
         done
       '';
       unitConfig.ConditionPathExists = flannelPaths;
+      serviceConfig = {
+        StartLimitInterval = 10;
+        StartLimitBurst = 20;
+      };
     };
 
     systemd.paths.flannel = {

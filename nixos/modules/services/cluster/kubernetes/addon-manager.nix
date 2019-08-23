@@ -114,6 +114,8 @@ in
         Group = "kubernetes";
         Restart = "on-failure";
         RestartSec = 10;
+        StartLimitInterval = 10;
+        StartLimitBurst = 20;
       };
       unitConfig.ConditionPathExists = addonManagerPaths;
     };
@@ -149,6 +151,10 @@ in
       '';
       script = "echo Ok";
       unitConfig.ConditionPathExists = bootstrapAddonsPaths;
+      serviceConfig = {
+        StartLimitInterval = 10;
+        StartLimitBurst = 20;
+      };
     };
 
     systemd.paths.kube-addon-manager-bootstrap = {

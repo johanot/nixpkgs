@@ -268,8 +268,8 @@ in {
         before = [ "kube-control-plane-online.target" ];
         path = [ pkgs.curl ];
         preStart = ''
-          until curl -Ssf ${cfg.apiserverAddress}/healthz do
-            echo curl -Ssf ${cfg.apiserverAddress}/healthz: exit status $?
+          until curl --cacert ${cfg.caFile} -Ssf ${cfg.apiserverAddress}/healthz; do
+            echo curl --cacert ${cfg.caFile} -Ssf ${cfg.apiserverAddress}/healthz: exit status $?
             sleep 3
           done
         '';

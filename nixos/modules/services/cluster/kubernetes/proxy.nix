@@ -82,6 +82,8 @@ in
         WorkingDirectory = top.dataDir;
         Restart = "on-failure";
         RestartSec = 5;
+        StartLimitInterval = 10;
+        StartLimitBurst = 20;
       };
       unitConfig.ConditionPathExists = proxyPaths;
     };

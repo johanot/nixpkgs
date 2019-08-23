@@ -385,6 +385,8 @@ in
             AmbientCapabilities = "cap_net_bind_service";
             Restart = "on-failure";
             RestartSec = 5;
+            StartLimitInterval = 10;
+            StartLimitBurst = 20;
           };
           unitConfig.ConditionPathExists = apiserverPaths;
         };
@@ -410,6 +412,10 @@ in
 
         systemd.services.etcd = {
           unitConfig.ConditionPathExists = etcdPaths;
+          serviceConfig = {
+            StartLimitInterval = 10;
+            StartLimitBurst = 20;
+          };
         };
 
         systemd.paths.etcd = {

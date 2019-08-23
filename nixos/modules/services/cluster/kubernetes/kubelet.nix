@@ -261,6 +261,8 @@ in
           MemoryAccounting = true;
           Restart = "on-failure";
           RestartSec = "1000ms";
+          StartLimitInterval = 10;
+          StartLimitBurst = 20;
           ExecStart = ''${top.package}/bin/kubelet \
             --address=${cfg.address} \
             --authentication-token-webhook \

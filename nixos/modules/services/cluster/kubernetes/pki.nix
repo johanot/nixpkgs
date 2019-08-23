@@ -274,6 +274,10 @@ in
           done
         '';
         unitConfig.ConditionPathExists = certmgrPaths;
+        serviceConfig = {
+          StartLimitInterval = 10;
+          StartLimitBurst = 20;
+        };
       };
 
       systemd.paths.certmgr = {
