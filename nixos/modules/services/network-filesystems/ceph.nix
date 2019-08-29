@@ -88,6 +88,14 @@ in
         '';
       };
 
+      mgrModulePath = mkOption {
+        type = types.path;
+        default = "${pkgs.ceph.lib}/lib/ceph/mgr";
+        description = ''
+          Path at which to find ceph-mgr modules.
+        '';
+      };
+
       monInitialMembers = mkOption {
         type = with types; nullOr commas;
         default = null;
