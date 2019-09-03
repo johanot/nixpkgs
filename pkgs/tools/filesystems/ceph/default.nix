@@ -83,6 +83,7 @@ let
     ps.cherrypy
     ps.pecan
     ps.prettytable
+    ps.pyjwt
     ps.webob
     ps.bcrypt
     ps.six
