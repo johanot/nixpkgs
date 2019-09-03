@@ -13,7 +13,7 @@
 # Optional Dependencies
 , yasm ? null, fcgi ? null, expat ? null
 , curl ? null, fuse ? null
-, libedit ? null, libatomic_ops ? null, kinetic-cpp-client ? null
+, libedit ? null, libatomic_ops ? null
 , libs3 ? null
 
 # Mallocs
@@ -43,7 +43,6 @@ let
   optFuse = shouldUsePkg fuse;
   optLibedit = shouldUsePkg libedit;
   optLibatomic_ops = shouldUsePkg libatomic_ops;
-  optKinetic-cpp-client = shouldUsePkg kinetic-cpp-client;
   optLibs3 = shouldUsePkg libs3;
 
   optJemalloc = shouldUsePkg jemalloc;
@@ -114,7 +113,6 @@ in rec {
       boost ceph-python-env libxml2 optYasm optLibatomic_ops optLibs3
       malloc zlib openldap lttng-ust babeltrace gperf cunit
       snappy rocksdb lz4 oathToolkit leveldb
-      optKinetic-cpp-client
       removeReferencesTo
     ] ++ optionals stdenv.isLinux [
       linuxHeaders utillinux libuuid udev keyutils optLibaio optLibxfs optZfs
