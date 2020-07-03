@@ -557,7 +557,10 @@ rec {
     extraCommands ? "", uid ? 0, gid ? 0,
     # We pick 100 to ensure there is plenty of room for extension. I
     # believe the actual maximum is 128.
-    maxLayers ? 100
+    maxLayers ? 100,
+    # Whether to output the final image in compressed tarball format (default) or as an un-compressed store-path, with preserved links to layers.
+    # The latter being particularly useful when using parts of the drv output as input for other builds.
+    doAssemble ? true,
   }:
     assert
       (lib.assertMsg (maxLayers > 1)
@@ -643,6 +646,10 @@ rec {
           -n object -s "$layerID" -i "$imageTag" \
           -i "$imageName" > image/repositories
 
+        ${if doAssemble then assemble else "cp -r ./image $out"}
+      '';
+
+      assemble = ''
         echo "Cooking the image..."
         # tar exits with an exit code of 1 if files changed while it was
         # reading them. It considers a change in the number of hard links
