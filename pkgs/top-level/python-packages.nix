@@ -577,6 +577,8 @@ in {
 
   cdecimal = callPackage ../development/python-modules/cdecimal { };
 
+  ceph-common = callPackage ../development/python-modules/ceph-common { };
+
   cfn-flip = callPackage ../development/python-modules/cfn-flip { };
 
   chalice = callPackage ../development/python-modules/chalice { };

@@ -76,6 +76,7 @@ let
   };
 
   ceph-python-env = python3Packages.python.withPackages (ps: [
+    ps.ceph-common
     ps.sphinx
     ps.flask
     ps.cython
