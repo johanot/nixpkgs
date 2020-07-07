@@ -76,7 +76,6 @@ let
   };
 
   ceph-python-env = python3Packages.python.withPackages (ps: [
-    ps.ceph-common
     ps.sphinx
     ps.flask
     ps.cython
@@ -84,12 +83,16 @@ let
     ps.virtualenv
     # Libraries needed by the python tools
     ps.Mako
+    ps.ceph-common
     ps.cherrypy
+    ps.dateutil
+    ps.jsonpatch
     ps.pecan
     ps.prettytable
     ps.pyjwt
     ps.webob
     ps.bcrypt
+    ps.scipy
     ps.six
     ps.pyyaml
   ]);
