@@ -94,7 +94,7 @@ let
   ]);
   sitePackages = ceph-python-env.python.sitePackages;
 
-  version = "14.2.10";
+  version = "15.2.3";
 in rec {
   ceph = stdenv.mkDerivation {
     pname = "ceph";
@@ -102,12 +102,8 @@ in rec {
 
     src = fetchurl {
       url = "http://download.ceph.com/tarballs/ceph-${version}.tar.gz";
-      sha256 = "0bbs3ag8zav283qpxrrndhvh2z01ykm6126fmwrbc1c5f9jfjq39";
+      sha256 = "00czcy11f7cmynhdjp399r77kwhwygs5x2ffy699cfwxamam1q8f";
     };
-
-    patches = [
-      ./0000-fix-SPDK-build-env.patch
-    ];
 
     nativeBuildInputs = [
       cmake
