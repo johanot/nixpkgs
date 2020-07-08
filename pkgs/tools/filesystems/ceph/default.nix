@@ -85,14 +85,11 @@ let
     ps.Mako
     ps.ceph-common
     ps.cherrypy
-    ps.dateutil
-    ps.jsonpatch
     ps.pecan
     ps.prettytable
     ps.pyjwt
     ps.webob
     ps.bcrypt
-    ps.scipy
     ps.six
     ps.pyyaml
   ]);
