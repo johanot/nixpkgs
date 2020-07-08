@@ -85,6 +85,7 @@ let
     ps.Mako
     ps.ceph-common
     ps.cherrypy
+    ps.dateutil
     ps.pecan
     ps.prettytable
     ps.pyjwt
