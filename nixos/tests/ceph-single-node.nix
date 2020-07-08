@@ -46,6 +46,7 @@ let
       sudo
       ceph
       xfsprogs
+      screen
     ];
 
     boot.kernelModules = [ "xfs" ];
@@ -83,6 +84,9 @@ let
 
     monA.wait_for_unit("network.target")
 
+    # Daemons will log to default locations, logs are useful for debugging tests
+    monA.succeed("mkdir -p /var/log/ceph && chown ceph /var/log/ceph")
+
     # Bootstrap ceph-mon daemon
     monA.succeed(
         "sudo -u ceph ceph-authtool --create-keyring /tmp/ceph.mon.keyring --gen-key -n mon. --cap mon 'allow *'",
@@ -106,8 +110,6 @@ let
         "systemctl start ceph-mgr-${cfg.monA.name}",
     )
     monA.wait_for_unit("ceph-mgr-a")
-    monA.wait_until_succeeds("ceph -s | grep 'quorum ${cfg.monA.name}'")
-    monA.wait_until_succeeds("ceph -s | grep 'mgr: ${cfg.monA.name}(active,'")
 
     # Bootstrap OSDs
     monA.succeed(
@@ -138,6 +140,10 @@ let
         "systemctl start ceph-osd-${cfg.osd1.name}",
         "systemctl start ceph-osd-${cfg.osd2.name}",
     )
+
+    monA.wait_until_succeeds("ceph -s | grep 'quorum ${cfg.monA.name}'")
+    monA.wait_until_succeeds("ceph -s | grep 'mgr: ${cfg.monA.name}(active,'")
+
     monA.wait_until_succeeds("ceph osd stat | grep -e '3 osds: 3 up[^,]*, 3 in'")
     monA.wait_until_succeeds("ceph -s | grep 'mgr: ${cfg.monA.name}(active,'")
     monA.wait_until_succeeds("ceph -s | grep 'HEALTH_OK'")
