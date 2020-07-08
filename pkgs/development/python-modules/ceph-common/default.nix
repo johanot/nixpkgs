@@ -2,11 +2,11 @@
 
 buildPythonPackage rec {
   pname = "ceph-common";
-  version = "15.2.3";
+  version = "15.2.4";
 
   src = fetchurl {
-    url = "https://github.com/ceph/ceph/archive/v${version}.tar.gz";
-    sha256 = "0jipyp7xhfmq1dhv9lvbl4bvrqq2fw2sl5m76pv9lw1z19gkfy0k";
+    url = "http://download.ceph.com/tarballs/ceph-${version}.tar.gz";
+    sha256 = "0jy5dp4r1bqk1l7nrv8l8zpl984k61p3vkvf73ygcn03bxyjjlax";
   };
 
   SOURCE_DATE_EPOCH=315532800;

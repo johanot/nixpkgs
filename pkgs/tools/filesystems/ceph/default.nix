@@ -98,7 +98,7 @@ let
   ]);
   sitePackages = ceph-python-env.python.sitePackages;
 
-  version = "15.2.3";
+  version = "15.2.4";
 in rec {
   ceph = stdenv.mkDerivation {
     pname = "ceph";
@@ -106,7 +106,7 @@ in rec {
 
     src = fetchurl {
       url = "http://download.ceph.com/tarballs/ceph-${version}.tar.gz";
-      sha256 = "00czcy11f7cmynhdjp399r77kwhwygs5x2ffy699cfwxamam1q8f";
+      sha256 = "0jy5dp4r1bqk1l7nrv8l8zpl984k61p3vkvf73ygcn03bxyjjlax";
     };
 
     nativeBuildInputs = [
