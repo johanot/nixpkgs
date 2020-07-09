@@ -92,7 +92,7 @@ let
     ps.pyjwt
     ps.webob
     ps.bcrypt
-    ps.scipy
+    ps.scipy_1_3
     ps.six
     ps.pyyaml
   ]);
