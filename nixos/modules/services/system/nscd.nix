@@ -32,20 +32,32 @@ in
       };
 
       config = mkOption {
-        type = types.lines;
+        type = types.nullOr types.lines;
         default = builtins.readFile ./nscd.conf;
         description = "Configuration to use for Name Service Cache Daemon.";
+      };
+
+      configFile = mkOption {
+        type = types.nullOr types.path;
+        default = null;
+        description = "Configuration file to use for Name Service Cache Daemon.";
       };
 
     };
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
-    environment.etc."nscd.conf".text = cfg.config;
+    assertions = [
+      {
+        assertion = cfg.config != null -> cfg.configFile == null;
+        message = "Cannot set both services.nscd.config and services.nscd.configFile";
+      }
+    ];
+
+    environment.etc."nscd.conf".source = if cfg.config == null then cfg.configFile else pkgs.writeText "etc-nscd.conf" cfg.config;
 
     systemd.services.nscd =
       { description = "Name Service Cache Daemon";
