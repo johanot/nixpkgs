@@ -435,6 +435,7 @@ stdenv.mkDerivation {
     "-Db_pie=true"
     "-Dinstall-sysconfdir=false"
     "-Defi-ld=${stdenv.cc.bintools.targetPrefix}ld"
+    "-Dservice_watchdog=20s"
     /*
       As of now, systemd doesn't allow runtime configuration of these values. So
       the settings in /etc/login.defs have no effect on it. Many people think this

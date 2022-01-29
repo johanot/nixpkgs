@@ -30,8 +30,8 @@ let
           mkMerge [
             {
               boot.postBootCommands = "rm -fr /var/lib/kubernetes/secrets /tmp/shared/*";
-              virtualisation.memorySize = mkDefault 1536;
-              virtualisation.diskSize = mkDefault 4096;
+              virtualisation.memorySize = mkDefault 8092;
+              virtualisation.diskSize = mkDefault 8092;
               networking = {
                 inherit domain extraHosts;
                 primaryIPAddress = mkForce machine.ip;
@@ -88,11 +88,10 @@ let
   mkKubernetesMultiNodeTest = attrs: mkKubernetesBaseTest ({
     machines = {
       machine1 = {
-        roles = ["master"];
+        roles = ["master" "node"];
         ip = "192.168.1.1";
       };
       machine2 = {
-        roles = ["node"];
         ip = "192.168.1.2";
       };
     };

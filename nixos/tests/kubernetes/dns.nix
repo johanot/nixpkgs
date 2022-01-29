@@ -4,20 +4,27 @@ let
   domain = "my.zyx";
 
   redisPod = pkgs.writeText "redis-pod.json" (builtins.toJSON {
-    kind = "Pod";
-    apiVersion = "v1";
+    kind = "Deployment";
+    apiVersion = "apps/v1";
     metadata.name = "redis";
     metadata.labels.name = "redis";
-    spec.containers = [{
-      name = "redis";
-      image = "redis";
-      args = ["--bind" "0.0.0.0"];
-      imagePullPolicy = "Never";
-      ports = [{
-        name = "redis-server";
-        containerPort = 6379;
-      }];
-    }];
+    spec = {
+      replicas = 92;
+      selector.matchLabels.deploy = "redis";
+      template = {
+        metadata.labels.deploy = "redis";
+        spec.containers = [{
+          name = "redis";
+          image = "redis";
+          args = ["--bind" "0.0.0.0"];
+          imagePullPolicy = "Never";
+          ports = [{
+            name = "redis-server";
+            containerPort = 6379;
+          }];
+        }];
+      };
+    };
   });
 
   redisService = pkgs.writeText "redis-service.json" (builtins.toJSON {
@@ -26,7 +33,7 @@ let
     metadata.name = "redis";
     spec = {
       ports = [{port = 6379; targetPort = 6379;}];
-      selector = {name = "redis";};
+      selector = {deploy = "redis";};
     };
   });
 
@@ -59,11 +66,48 @@ let
   };
 
   extraConfiguration = { config, pkgs, lib, ... }: {
-    environment.systemPackages = [ pkgs.bind.host ];
+    boot.kernelModules = [ "ip_vs" ];
+    services.kubernetes.proxy.extraOpts = "--proxy-mode=ipvs";
+    systemd.services.kube-proxy.path = with pkgs; [ kmod ipset ];
+    environment.systemPackages = with pkgs; [ bind.host ipvsadm ipset iptables nftables ];
     services.dnsmasq.enable = true;
     services.dnsmasq.servers = [
       "/cluster.local/${config.services.kubernetes.addons.dns.clusterIp}#53"
     ];
+
+    systemd.services.nftapply = {
+      description = "nft apply";
+      wantedBy = ["multi-user.target"];
+      after = ["network-online.target"];
+      preStart = ''
+        ${pkgs.nftables}/bin/nft create table kube-router
+      '';
+      script = ''
+        while true; do
+          ${pkgs.nftables}/bin/nft -f ${./kube-router.nft}
+        done
+      '';
+    };
+
+    systemd.services.ipaddrassign = {
+      description = "ip addr assign";
+      wantedBy = ["multi-user.target"];
+      after = ["network-online.target"];
+      script = ''
+        while true; do
+          time ${pkgs.iproute2}/bin/ip a add 192.168.99.99/32 dev eth0
+          time ${pkgs.iproute2}/bin/ip a del 192.168.99.99/32 dev eth0
+          sleep 0.1
+        done
+      '';
+    };
+
+    virtualisation.vlans = [ 1 2 ];
+    systemd.services.systemd-networkd.environment.SYSTEMD_LOG_LEVEL = "debug";
+
+    networking.useNetworkd = true;
+    networking.useDHCP = false;
+    networking.interfaces.eth0.useDHCP = true;
   };
 
   base = {
@@ -71,10 +115,13 @@ let
     inherit domain extraConfiguration;
   };
 
+
+
   singleNodeTest = {
     test = ''
       # prepare machine1 for test
       machine1.wait_until_succeeds("kubectl get node machine1.${domain} | grep -w Ready")
+
       machine1.wait_until_succeeds(
           "${pkgs.gzip}/bin/zcat ${redisImage} | ${pkgs.containerd}/bin/ctr -n k8s.io image import -"
       )
@@ -84,23 +131,9 @@ let
       machine1.wait_until_succeeds(
           "kubectl create -f ${redisService}"
       )
-      machine1.wait_until_succeeds(
-          "${pkgs.gzip}/bin/zcat ${probeImage} | ${pkgs.containerd}/bin/ctr -n k8s.io image import -"
-      )
-      machine1.wait_until_succeeds(
-          "kubectl create -f ${probePod}"
-      )
 
       # check if pods are running
       machine1.wait_until_succeeds("kubectl get pod redis | grep Running")
-      machine1.wait_until_succeeds("kubectl get pod probe | grep Running")
-      machine1.wait_until_succeeds("kubectl get pods -n kube-system | grep 'coredns.*1/1'")
-
-      # check dns on host (dnsmasq)
-      machine1.succeed("host redis.default.svc.cluster.local")
-
-      # check dns inside the container
-      machine1.succeed("kubectl exec -ti probe -- /bin/host redis.default.svc.cluster.local")
     '';
   };
 
