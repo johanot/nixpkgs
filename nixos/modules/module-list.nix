@@ -367,12 +367,12 @@
   ./services/cluster/k3s/default.nix
   ./services/cluster/kubernetes/addon-manager.nix
   ./services/cluster/kubernetes/addons/dns.nix
+  ./services/cluster/kubernetes/auto-configure
   ./services/cluster/kubernetes/apiserver.nix
   ./services/cluster/kubernetes/controller-manager.nix
   ./services/cluster/kubernetes/default.nix
   ./services/cluster/kubernetes/flannel.nix
   ./services/cluster/kubernetes/kubelet.nix
-  ./services/cluster/kubernetes/pki.nix
   ./services/cluster/kubernetes/proxy.nix
   ./services/cluster/kubernetes/scheduler.nix
   ./services/cluster/pacemaker/default.nix

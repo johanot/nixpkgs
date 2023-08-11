@@ -6,6 +6,8 @@ let
   top = config.services.kubernetes;
   otop = options.services.kubernetes;
   cfg = top.controllerManager;
+
+  isRBACEnabled = elem "RBAC" top.apiserver.settings.authorization-mode; #TODOk8s: better auto-onconfigure
 in
 {
 
@@ -130,7 +132,7 @@ in
             "--tls-cert-file=${cfg.tlsCertFile}"} \
           ${optionalString (cfg.tlsKeyFile!=null)
             "--tls-private-key-file=${cfg.tlsKeyFile}"} \
-          ${optionalString (elem "RBAC" top.apiserver.authorizationMode)
+          ${optionalString isRBACEnabled
             "--use-service-account-credentials"} \
           ${optionalString (cfg.verbosity != null) "--v=${toString cfg.verbosity}"} \
           ${cfg.extraOpts}

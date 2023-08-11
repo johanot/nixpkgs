@@ -245,7 +245,7 @@ in {
 
     (mkIf cfg.apiserver.enable {
       services.kubernetes.pki.etcClusterAdminKubeconfig = mkDefault "kubernetes/cluster-admin.kubeconfig";
-      services.kubernetes.apiserver.etcd.servers = mkDefault etcdEndpoints;
+      services.kubernetes.apiserver.settings.etcd-servers = mkDefault etcdEndpoints;
     })
 
     (mkIf cfg.kubelet.enable {
@@ -300,9 +300,9 @@ in {
       # dns addon is enabled by default
       services.kubernetes.addons.dns.enable = mkDefault true;
 
-      services.kubernetes.apiserverAddress = mkDefault ("https://${if cfg.apiserver.advertiseAddress != null
-                          then cfg.apiserver.advertiseAddress
-                          else "${cfg.masterAddress}:${toString cfg.apiserver.securePort}"}");
+      services.kubernetes.apiserverAddress = mkDefault ("https://${if cfg.apiserver.settings.advertise-address != null
+                          then cfg.apiserver.settings.advertise-address
+                          else "${cfg.masterAddress}:${toString cfg.apiserver.settings.secure-port}"}");
     })
   ];
 

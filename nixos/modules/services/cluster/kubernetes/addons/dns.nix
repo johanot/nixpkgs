@@ -19,13 +19,13 @@ in {
 
       # this default is also what kubernetes users
       default = (
-        concatStringsSep "." (
-          take 3 (splitString "." config.services.kubernetes.apiserver.serviceClusterIpRange
+        concatStringsSep "." ( #TODOk8s: since this uses autoConfigure, maybe the entire configuration of the dns addon should be moved there?
+          take 3 (splitString "." config.services.kubernetes.autoConfigure.serviceClusterIpRange
         ))
       ) + ".254";
       defaultText = literalMD ''
         The `x.y.z.254` IP of
-        `config.${options.services.kubernetes.apiserver.serviceClusterIpRange}`.
+        `config.${options.services.kubernetes.apiserver.settings.service-cluster-ip-range}`.
       '';
       type = types.str;
     };

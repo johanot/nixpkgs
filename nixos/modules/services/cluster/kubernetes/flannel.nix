@@ -8,6 +8,8 @@ let
 
   # we want flannel to use kubernetes itself as configuration backend, not direct etcd
   storageBackend = "kubernetes";
+
+  isRBACEnabled = elem "RBAC" top.apiserver.settings.authorization-mode; #TODOk8s: better auto-onconfigure
 in
 {
   ###### interface
@@ -54,7 +56,7 @@ in
     };
 
     # give flannel some kubernetes rbac permissions if applicable
-    services.kubernetes.addonManager.bootstrapAddons = mkIf ((storageBackend == "kubernetes") && (elem "RBAC" top.apiserver.authorizationMode)) {
+    services.kubernetes.addonManager.bootstrapAddons = mkIf ((storageBackend == "kubernetes") && isRBACEnabled) {
 
       flannel-cr = {
         apiVersion = "rbac.authorization.k8s.io/v1";

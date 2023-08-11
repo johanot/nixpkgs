@@ -53,11 +53,12 @@ let
               services.kubernetes = {
                 proxy.hostname = "${masterName}.${domain}";
 
+                autoConfigure.enable = true;
                 easyCerts = true;
                 inherit (machine) roles;
-                apiserver = {
-                  securePort = 443;
-                  advertiseAddress = master.ip;
+                apiserver.settings = {
+                  secure-port = 443;
+                  advertise-address = master.ip;
                 };
                 masterAddress = "${masterName}.${config.networking.domain}";
               };
