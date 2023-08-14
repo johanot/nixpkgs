@@ -48,11 +48,6 @@ let
     "verbosity" = "v";
     "webhookConfig" = "authentication-token-webhook-config-file";
   };
-
-  render = v:
-    if isList v
-    then concatStringsSep "," v
-    else toString v;
 in
 {
   # TODO: Remove in NixOS 24.05
@@ -94,7 +89,7 @@ in
       serviceConfig = {
         Slice = "kubernetes.slice";
         ExecStart = ''${top.package}/bin/kube-apiserver \
-          ${concatStringsSep " \\\n" (mapAttrsToList (n: v: ''--${n}="${render v}"'') cfg.settings)}
+          ${concatStringsSep " \\\n" (mapAttrsToList (n: v: ''--${n}="${top.lib.renderArg v}"'') cfg.settings)}
         '';
         WorkingDirectory = top.dataDir;
         User = "kubernetes";

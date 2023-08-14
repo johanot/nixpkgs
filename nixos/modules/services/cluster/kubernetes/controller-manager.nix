@@ -27,13 +27,6 @@ let
     "tlsKeyFile" = "tls-private-key-file";
     "verbosity" = "v";
   };
-
-  render = v:
-    if isList v
-    then concatStringsSep "," v
-    else if isBool v
-    then boolToString v
-    else toString v;
 in
 {
   # TODO: Remove in NixOS 24.05
@@ -74,7 +67,7 @@ in
         Restart = "on-failure";
         Slice = "kubernetes.slice";
         ExecStart = ''${top.package}/bin/kube-controller-manager \
-          ${concatStringsSep " \\\n" (mapAttrsToList (n: v: ''--${n}="${render v}"'') cfg.settings)}
+          ${concatStringsSep " \\\n" (mapAttrsToList (n: v: ''--${n}="${top.lib.renderArg v}"'') cfg.settings)}
         '';
         WorkingDirectory = top.dataDir;
         User = "kubernetes";

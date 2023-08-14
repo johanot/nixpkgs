@@ -100,6 +100,13 @@ let
       default = null;
     };
   };
+
+  renderArg = v:
+    if isList v
+    then concatStringsSep "," v
+    else if isBool v
+    then boolToString v
+    else toString v;
 in {
 
   ###### interface
@@ -183,6 +190,7 @@ in {
         inherit mkCert;
         inherit mkKubeConfig;
         inherit mkKubeConfigOptions;
+        inherit renderArg;
       };
       type = types.attrs;
     };
