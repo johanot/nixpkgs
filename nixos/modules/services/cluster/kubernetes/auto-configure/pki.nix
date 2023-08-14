@@ -36,10 +36,6 @@ let
     };
 
   remote = with config.services; "https://${kubernetes.masterAddress}:${toString cfssl.port}";
-
-  apiserverServiceIP = (concatStringsSep "." (
-    take 3 (splitString "." top.autoConfigure.serviceClusterIpRange
-  )) + ".1");
 in
 {
   ###### interface
@@ -405,77 +401,12 @@ in
             keyFile = mkDefault key;
           };
         };
-        proxy = mkIf top.proxy.enable {
-          kubeconfig = with cfg.certs.kubeProxyClient; {
-            certFile = mkDefault cert;
-            keyFile = mkDefault key;
-          };
-        };
-      };
-
-      services.kubernetes.pki.certs = with top.lib; {
-        apiServer = mkCert {
-          name = "kube-apiserver";
-          CN = "kubernetes";
-          hosts = [
-                    "kubernetes.default.svc"
-                    "kubernetes.default.svc.${top.addons.dns.clusterDomain}"
-                    top.apiserver.settings.advertise-address
-                    top.masterAddress
-                    apiserverServiceIP
-                    "127.0.0.1"
-                  ] ++ top.pki.apiServerExtraSANs;
-          action = "systemctl restart kube-apiserver.service";
-        };
-        apiserverProxyClient = mkCert {
-          name = "kube-apiserver-proxy-client";
-          CN = "front-proxy-client";
-          action = "systemctl restart kube-apiserver.service";
-        };
-        apiserverKubeletClient = mkCert {
-          name = "kube-apiserver-kubelet-client";
-          CN = "system:kube-apiserver";
-          action = "systemctl restart kube-apiserver.service";
-        };
-        apiserverEtcdClient = mkCert {
-          name = "kube-apiserver-etcd-client";
-          CN = "etcd-client";
-          action = "systemctl restart kube-apiserver.service";
-        };
-        clusterAdmin = mkCert {
-          name = "cluster-admin";
-          CN = "cluster-admin";
-          fields = {
-            O = "system:masters";
-          };
-          privateKeyOwner = "root";
-        };
-        controllerManager = mkCert {
-          name = "kube-controller-manager";
-          CN = "kube-controller-manager";
-          action = "systemctl restart kube-controller-manager.service";
-        };
-        controllerManagerClient = mkCert {
-          name = "kube-controller-manager-client";
-          CN = "system:kube-controller-manager";
-          action = "systemctl restart kube-controller-manager.service";
-        };
-        etcd = mkCert {
-          name = "etcd";
-          CN = top.masterAddress;
-          hosts = [
-                    "etcd.local"
-                    "etcd.${top.addons.dns.clusterDomain}"
-                    top.masterAddress
-                    top.apiserver.settings.advertise-address
-                  ];
-          privateKeyOwner = "etcd";
-          action = "systemctl restart etcd.service";
-        };
-        schedulerClient = top.lib.mkCert {
-          name = "kube-scheduler-client";
-          CN = "system:kube-scheduler";
-          action = "systemctl restart kube-scheduler.service";
+        proxy.settings = mkIf top.proxy.enable {
+          kubeconfig = top.lib.mkKubeConfig "kube-proxy-client" (with cfg.certs.kubeProxyClient; {
+            server = top.apiserverAddress; #TODOk8s: these top-level options might disappear?
+            certFile = cert;
+            keyFile = key;
+          });
         };
       };
     });

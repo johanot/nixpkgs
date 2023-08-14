@@ -1,7 +1,13 @@
-{ config, lib, ... }: {
+{ config, lib, ... }:
+let
+  top = config.services.kubernetes;
+  cfg = top.autoConfigure;
+in
+{
 
   imports = [
     ./control-plane.nix
+    ./node.nix
     ./pki.nix
   ];
 
@@ -32,6 +38,20 @@
       '';
       default = "10.0.0.0/24";
       type = str;
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    services.kubernetes.proxy.settings = {
+      cluster-cidr = top.clusterCidr; #TODOk8s: these top-level options might disappear?
+    };
+
+    services.kubernetes.pki.certs = with top.lib; {
+      kubeProxyClient = top.lib.mkCert {
+        name = "kube-proxy-client";
+        CN = "system:kube-proxy";
+        action = "systemctl restart kube-proxy.service";
+      };
     };
   };
 }
