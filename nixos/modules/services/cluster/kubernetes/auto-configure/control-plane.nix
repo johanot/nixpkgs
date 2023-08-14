@@ -2,6 +2,7 @@
 let
   top = config.services.kubernetes;
   cfg = top.autoConfigure;
+  pki = services.kubernetes.pki;
 
   isControlPlaneNode = elem "master" top.roles;
 
@@ -21,6 +22,12 @@ in
       authorization-mode = cfg.authorizationMode;
       service-cluster-ip-range = cfg.serviceClusterIpRange;
       service-account-issuer = cfg.serviceAccountIssuer;
+    };
+
+    services.kubernetes.controllerManager.settings = {
+      allocate-node-cidrs = true;
+      cluster-cidr = top.clusterCidr; #TODOk8s: these top-level options might disappear?
+      use-service-account-credentials = mkDefault isRBACEnabled;
     };
 
     services.etcd = {
@@ -91,6 +98,16 @@ in
           O = "system:masters";
         };
         privateKeyOwner = "root";
+      };
+      controllerManager = mkCert {
+        name = "kube-controller-manager";
+        CN = "kube-controller-manager";
+        action = "systemctl restart kube-controller-manager.service";
+      };
+      controllerManagerClient = mkCert {
+        name = "kube-controller-manager-client";
+        CN = "system:kube-controller-manager";
+        action = "systemctl restart kube-controller-manager.service";
       };
       etcd = mkCert {
         name = "etcd";

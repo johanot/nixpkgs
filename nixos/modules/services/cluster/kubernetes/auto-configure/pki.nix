@@ -376,13 +376,14 @@ in
           proxy-client-cert-file = mkDefault cfg.certs.apiserverProxyClient.cert;
           proxy-client-key-file = mkDefault cfg.certs.apiserverProxyClient.key;
         });
-        controllerManager = mkIf top.controllerManager.enable {
-          serviceAccountKeyFile = mkDefault cfg.certs.serviceAccount.key;
-          rootCaFile = cfg.certs.controllerManagerClient.caCert;
-          kubeconfig = with cfg.certs.controllerManagerClient; {
-            certFile = mkDefault cert;
-            keyFile = mkDefault key;
-          };
+        controllerManager.settings = mkIf top.controllerManager.enable {
+          service-account-private-key-file = mkDefault cfg.certs.serviceAccount.key;
+          root-ca-file = cfg.certs.controllerManagerClient.caCert;
+          kubeconfig = top.lib.mkKubeConfig "controller-manager-client" (with cfg.certs.controllerManagerClient; {
+            server = top.apiserverAddress; #TODOk8s: these top-level options might disappear?
+            certFile = cert;
+            keyFile = key;
+          });
         };
         scheduler = mkIf top.scheduler.enable {
           kubeconfig = with cfg.certs.schedulerClient; {
