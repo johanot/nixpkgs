@@ -121,6 +121,11 @@ in
         privateKeyOwner = "etcd";
         action = "systemctl restart etcd.service";
       };
+      schedulerClient = top.lib.mkCert {
+        name = "kube-scheduler-client";
+        CN = "system:kube-scheduler";
+        action = "systemctl restart kube-scheduler.service";
+      };
     };
   };
 }
