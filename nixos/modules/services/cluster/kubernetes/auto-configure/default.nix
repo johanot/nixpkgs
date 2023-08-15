@@ -2,12 +2,11 @@
 let
   top = config.services.kubernetes;
   cfg = top.autoConfigure;
+  hostname = config.networking.fqdnOrHostName;
 in
 {
-
   imports = [
     ./control-plane.nix
-    ./node.nix
     ./pki.nix
   ];
 
@@ -45,12 +44,31 @@ in
     services.kubernetes.proxy.settings = {
       cluster-cidr = top.clusterCidr; #TODOk8s: these top-level options might disappear?
     };
+    services.kubernetes.kubelet.settings = {
+      cgroup-driver = "systemd";
+      cluster-dns = top.addons.dns.clusterIp;
+      hostname-override = hostname;
+    };
 
     services.kubernetes.pki.certs = with top.lib; {
       kubeProxyClient = top.lib.mkCert {
         name = "kube-proxy-client";
         CN = "system:kube-proxy";
         action = "systemctl restart kube-proxy.service";
+      };
+      kubelet = mkCert {
+        name = "kubelet";
+        CN = hostname;
+        action = "systemctl restart kubelet.service";
+
+      };
+      kubeletClient = mkCert {
+        name = "kubelet-client";
+        CN = "system:node:${hostname}";
+        fields = {
+          O = "system:nodes";
+        };
+        action = "systemctl restart kubelet.service";
       };
     };
   };

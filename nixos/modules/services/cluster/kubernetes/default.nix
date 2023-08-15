@@ -223,20 +223,21 @@ in {
       services.etcd.enable = true; # Cannot mkDefault because of flannel default options
       services.kubernetes.kubelet = {
         enable = mkDefault true;
-        taints = mkIf (!(elem "node" cfg.roles)) {
-          master = {
-            key = "node-role.kubernetes.io/master";
-            value = "true";
-            effect = "NoSchedule";
-          };
-        };
+        #taints = mkIf (!(elem "node" cfg.roles)) {
+        #  master = {
+        #    key = "node-role.kubernetes.io/master";
+        ##    value = "true";
+        #    effect = "NoSchedule";
+        #  }; #
+        #}; #TODOk8s
       };
     })
 
 
     (mkIf (all (el: el == "master") cfg.roles) {
       # if this node is only a master make it unschedulable by default
-      services.kubernetes.kubelet.unschedulable = mkDefault true;
+      services.kubernetes.kubelet.settings.register-with-taints = "unschedulable=true:NoSchedule"; #TODOk8s: move to auto-configure
+      #services.kubernetes.kubelet.unschedulable = mkDefault true;
     })
 
     (mkIf (elem "node" cfg.roles) {

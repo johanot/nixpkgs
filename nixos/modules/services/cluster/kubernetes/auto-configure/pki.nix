@@ -392,14 +392,15 @@ in
             keyFile = key;
           });
         };
-        kubelet = mkIf top.kubelet.enable {
-          clientCaFile = mkDefault cfg.certs.kubelet.caCert;
-          tlsCertFile = mkDefault cfg.certs.kubelet.cert;
-          tlsKeyFile = mkDefault cfg.certs.kubelet.key;
-          kubeconfig = with cfg.certs.kubeletClient; {
-            certFile = mkDefault cert;
-            keyFile = mkDefault key;
-          };
+        kubelet.settings = mkIf top.kubelet.enable {
+          client-ca-file = mkDefault cfg.certs.kubelet.caCert;
+          tls-cert-file = mkDefault cfg.certs.kubelet.cert;
+          tls-private-key-file = mkDefault cfg.certs.kubelet.key;
+          kubeconfig = top.lib.mkKubeConfig "kubelet-client" (with cfg.certs.kubeletClient; {
+            server = top.apiserverAddress; #TODOk8s: these top-level options might disappear?
+            certFile = cert;
+            keyFile = key;
+          });
         };
         proxy.settings = mkIf top.proxy.enable {
           kubeconfig = top.lib.mkKubeConfig "kube-proxy-client" (with cfg.certs.kubeProxyClient; {

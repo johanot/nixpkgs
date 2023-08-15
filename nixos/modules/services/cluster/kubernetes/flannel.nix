@@ -24,7 +24,7 @@ in
       enable = mkDefault true;
       network = mkDefault top.clusterCidr;
       inherit storageBackend;
-      nodeName = config.services.kubernetes.kubelet.hostname;
+      nodeName = config.services.kubernetes.kubelet.settings.hostname-override; #TODOk8s: move to auto-configure
     };
 
     services.kubernetes.kubelet = {
