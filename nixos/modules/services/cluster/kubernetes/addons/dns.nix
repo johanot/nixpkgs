@@ -20,12 +20,12 @@ in {
       # this default is also what kubernetes users
       default = (
         concatStringsSep "." (
-          take 3 (splitString "." config.services.kubernetes.apiserver.serviceClusterIpRange
+          take 3 (splitString "." config.services.kubernetes.apiserver.settings.service-cluster-ip-range
         ))
       ) + ".254";
       defaultText = literalMD ''
         The `x.y.z.254` IP of
-        `config.${options.services.kubernetes.apiserver.serviceClusterIpRange}`.
+        `config.${options.services.kubernetes.apiserver.settings.service-cluster-ip-range}`.
       '';
       type = types.str;
     };

@@ -6,6 +6,13 @@ let
   cfg = config.services.kubernetes;
   opt = options.services.kubernetes;
 
+  renderArg = v:
+    if isList v
+    then concatStringsSep "," v
+    else if isBool v
+    then boolToString v
+    else toString v;
+
   defaultContainerdSettings = {
     version = 2;
     root = "/var/lib/containerd";
@@ -183,6 +190,7 @@ in {
         inherit mkCert;
         inherit mkKubeConfig;
         inherit mkKubeConfigOptions;
+        inherit renderArg;
       };
       type = types.attrs;
     };
@@ -241,11 +249,19 @@ in {
       services.kubernetes.flannel.enable = mkDefault true;
       services.flannel.etcd.endpoints = mkDefault etcdEndpoints;
       services.kubernetes.easyCerts = mkDefault true;
+
+      # these are some defaults which were previously generic option defaults in nixpkgs
+      services.kubernetes.apiserver.settings = rec{
+        api-audiences = "api,${service-account-issuer}";
+        authorization-mode = ["RBAC" "Node"];
+        service-cluster-ip-range = "10.0.0.0/24";
+        service-account-issuer = "https://kubernetes.default.svc";
+      };
     })
 
     (mkIf cfg.apiserver.enable {
       services.kubernetes.pki.etcClusterAdminKubeconfig = mkDefault "kubernetes/cluster-admin.kubeconfig";
-      services.kubernetes.apiserver.etcd.servers = mkDefault etcdEndpoints;
+      services.kubernetes.apiserver.settings.etcd-servers = mkDefault etcdEndpoints;
     })
 
     (mkIf cfg.kubelet.enable {
@@ -300,9 +316,9 @@ in {
       # dns addon is enabled by default
       services.kubernetes.addons.dns.enable = mkDefault true;
 
-      services.kubernetes.apiserverAddress = mkDefault ("https://${if cfg.apiserver.advertiseAddress != null
-                          then cfg.apiserver.advertiseAddress
-                          else "${cfg.masterAddress}:${toString cfg.apiserver.securePort}"}");
+      services.kubernetes.apiserverAddress = mkDefault ("https://${if cfg.apiserver.settings.advertise-address != null
+                          then cfg.apiserver.settings.advertise-address
+                          else "${cfg.masterAddress}:${toString cfg.apiserver.settings.secure-port}"}");
     })
   ];
 
