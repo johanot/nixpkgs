@@ -239,7 +239,9 @@ in {
       services.flannel.etcd.endpoints = mkDefault etcdEndpoints;
       services.kubernetes.easyCerts = mkDefault true;
 
-      # these are some defaults which were previously generic option defaults in nixpkgs
+      # these are some defaults which were previously option defaults in nixpkgs
+      # they are kept here to make at least some easy/minimal configuration of a Kubernetes cluster possible
+      # and to not surprise users of this feature too much, yet
       services.kubernetes.apiserver.settings = rec{
         api-audiences = "api,${service-account-issuer}";
         authorization-mode = ["RBAC" "Node"];
