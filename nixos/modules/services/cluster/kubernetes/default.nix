@@ -257,6 +257,12 @@ in {
         service-cluster-ip-range = "10.0.0.0/24";
         service-account-issuer = "https://kubernetes.default.svc";
       };
+
+      services.kubernetes.controllerManager.settings = {
+        allocate-node-cidrs = true;
+        cluster-cidr = cfg.clusterCidr;
+        use-service-account-credentials = true;
+      };
     })
 
     (mkIf cfg.apiserver.enable {
