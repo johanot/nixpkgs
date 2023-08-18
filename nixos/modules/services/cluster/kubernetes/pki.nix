@@ -386,11 +386,12 @@ in
             keyFile = key;
           });
         };
-        scheduler = mkIf top.scheduler.enable {
-          kubeconfig = with cfg.certs.schedulerClient; {
-            certFile = mkDefault cert;
-            keyFile = mkDefault key;
-          };
+        scheduler.settings = mkIf top.scheduler.enable {
+          kubeconfig = top.lib.mkKubeConfig "scheduler-client" (with cfg.certs.schedulerClient; {
+            server = top.apiserverAddress;
+            certFile = cert;
+            keyFile = key;
+          });
         };
         kubelet = mkIf top.kubelet.enable {
           clientCaFile = mkDefault cfg.certs.kubelet.caCert;
