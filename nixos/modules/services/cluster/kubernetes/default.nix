@@ -263,6 +263,10 @@ in {
         cluster-cidr = cfg.clusterCidr;
         hostname-override = cfg.kubelet.hostname;
       };
+
+      services.kubernetes.addons.dns.clusterIp = concatStringsSep "." (
+        take 3 (splitString "." cfg.apiserver.settings.service-cluster-ip-range
+      )) + ".254";
     })
 
     (mkIf cfg.apiserver.enable {
