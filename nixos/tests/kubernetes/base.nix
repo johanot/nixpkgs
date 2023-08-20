@@ -51,7 +51,7 @@ let
               environment.systemPackages = [ wrapKubectl ];
               services.flannel.iface = "eth1";
               services.kubernetes = {
-                proxy.hostname = "${masterName}.${domain}";
+                proxy.settings.hostname-override = lib.mkForce "${masterName}.${domain}";
 
                 easyCerts = true;
                 inherit (machine) roles;

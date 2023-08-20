@@ -403,11 +403,12 @@ in
             keyFile = key;
           });
         };
-        proxy = mkIf top.proxy.enable {
-          kubeconfig = with cfg.certs.kubeProxyClient; {
-            certFile = mkDefault cert;
-            keyFile = mkDefault key;
-          };
+        proxy.settings = mkIf top.proxy.enable {
+          kubeconfig = top.lib.mkKubeConfig "kubeproxy-client" (with cfg.certs.kubeProxyClient; {
+            server = top.apiserverAddress;
+            certFile = cert;
+            keyFile = key;
+          });
         };
       };
     });

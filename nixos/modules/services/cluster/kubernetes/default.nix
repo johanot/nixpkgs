@@ -258,6 +258,11 @@ in {
       services.kubernetes.kubelet.settings = {
         cgroup-driver = "systemd";
       };
+
+      services.kubernetes.proxy.settings = {
+        cluster-cidr = cfg.clusterCidr;
+        hostname-override = cfg.kubelet.hostname;
+      };
     })
 
     (mkIf cfg.apiserver.enable {
