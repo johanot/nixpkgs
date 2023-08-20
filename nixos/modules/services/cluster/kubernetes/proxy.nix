@@ -35,6 +35,12 @@ in
     enable = mkEnableOption (lib.mdDoc "Kubernetes proxy");
 
     settings = mkOption {
+      description = ''
+        Configuration for kube-proxy, see:
+          <https://kubernetes.io/docs/reference/command-line-tools-reference/kube-proxy>.
+        All attrs defined here translates directly to flags of syntax `--<name>="<value>"`
+        which is provided as command line argument to the kube-proxy binary.
+      '';
       type = types.submodule {
         freeformType = attrsOf (oneOf [
           bool

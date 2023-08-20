@@ -39,6 +39,12 @@ in
     enable = mkEnableOption (lib.mdDoc "Kubernetes scheduler");
 
     settings = mkOption {
+      description = ''
+        Configuration for kube-scheduler, see:
+          <https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler>.
+        All attrs defined here translates directly to flags of syntax `--<name>="<value>"`
+        which is provided as command line argument to the kube-scheduler binary.
+      '';
       type = types.submodule {
         freeformType = attrsOf (oneOf [
           bool

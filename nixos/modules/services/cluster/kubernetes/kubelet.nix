@@ -126,6 +126,12 @@ in
     };
 
     settings = mkOption {
+      description = ''
+        Configuration for kubelet, see:
+          <https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet>.
+        All attrs defined here translates directly to flags of syntax `--<name>="<value>"`
+        which is provided as command line argument to the kubelet binary.
+      '';
       type = types.submodule {
         freeformType = attrsOf (oneOf [
           bool

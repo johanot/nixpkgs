@@ -22,10 +22,10 @@ in {
         concatStringsSep "." (
           take 3 (splitString "." config.services.kubernetes.apiserver.settings.service-cluster-ip-range
         ))
-      ) + ".254";
+      ) + ".254"; #TODOk8s: remove default here and smart-set it for smart-config only
       defaultText = literalMD ''
         The `x.y.z.254` IP of
-        `config.${options.services.kubernetes.apiserver.settings.service-cluster-ip-range}`.
+        `config.options.services.kubernetes.apiserver.settings.service-cluster-ip-range`.
       '';
       type = types.str;
     };

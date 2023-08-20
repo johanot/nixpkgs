@@ -41,6 +41,12 @@ in
     enable = mkEnableOption (mdDoc "Kubernetes controller manager");
 
     settings = mkOption {
+      description = ''
+        Configuration for kube-controller-manager, see:
+          <https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager>.
+        All attrs defined here translates directly to flags of syntax `--<name>="<value>"`
+        which is provided as command line argument to the kube-controller-manager binary.
+      '';
       type = types.submodule {
         freeformType = attrsOf (oneOf [
           bool

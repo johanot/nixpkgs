@@ -75,6 +75,12 @@ in
     enable = mkEnableOption (mdDoc "Kubernetes apiserver");
 
     settings = mkOption {
+      description = ''
+        Configuration for kube-apiserver, see:
+          <https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver>.
+        All attrs defined here translates directly to flags of syntax `--<name>="<value>"`
+        which is provided as command line argument to the kube-apiserver binary.
+      '';
       type = types.submodule {
         freeformType = attrsOf (oneOf [
           bool
